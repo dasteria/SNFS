@@ -1,0 +1,45 @@
+run make to generate three executables: serverSNFS clientapp throughput, and one shared library file libclientSNFS.so.
+*******************************************************************************
+serverSNFS:
+Usage serverSNFS <­-port port#> <-­mount filepath>
+for example: serverSNFS ­-port 12345 -­mount /tmp/fs416
+
+clientapp:
+Usage clientapp Usage clientapp <serverIP> <­port#> <filename>
+for example: clientapp cd.cs.rutgers.edu 10889 file.in
+The program will print the status of two files accessed on the server.
+
+throughput:
+Usage throughput <serverIP> <­port#> <client app number>
+for example: throughput ­cd.cs.rutgers.edu 10889 20
+The number of clients should be less than 200.
+The program will print a list of pid and total number of CPU cylces for executing 10 client APIs.
+*******************************************************************************
+list of files:
+
+macro.h: This file is included by all other c source files.
+         This file contains shared marcos and common routines.
+
+serverSNFS.c: the source file for serverSNFS.
+              This server has a quene of length 30, which can be changed by changing the value of QUEUE_LN in the file.
+
+clientSNFS.c: the source file for the shared library.
+              The setServer fucntion should be called ONLY ONCE before all other operations.
+              This function will output error message if any. And all subsequnt API calls will fail if an error happened during setServer.
+              When running a multithreaded program using this library, the setServer fucntion should be called ONLY ONCE by any thread before accessing all other APIs!
+              REPEATED calling setServer will be assigned different ids, thus will be treated as DIFFERENT clients by the server.
+              All threads in ONE process will be treated as ONE client by the server!
+              It also contains:(datatime is save as String, because it was not specified in the assignment, and this is easier to output.)
+              struct fileStat
+              {
+                off_t size;                  /* total size, in bytes */
+                char birthtime[DATE_LN];     /* time of creation */
+                char atime[DATE_LN];         /* time of last access */
+                char mtime[DATE_LN];         /* time of last modification */
+              };
+
+clientapp.c: the source file for clientapp.
+             This file implements requirements specified by the assignment
+
+throughput.c: the source file for throughput.
+              This program will fork a certain number of client apps (1 to 200) and each app will run 10 client APIs on different files on the server, and report its pids and the total number of cpu cycles spent. 
